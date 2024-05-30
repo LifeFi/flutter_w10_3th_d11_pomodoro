@@ -49,7 +49,7 @@ class TimerCard extends StatelessWidget {
                   fontSize: 55,
                   fontWeight: FontWeight.bold,
                   color: isDimmed
-                      ? Theme.of(context).colorScheme.primary.withOpacity(0.5)
+                      ? Theme.of(context).colorScheme.secondary.withOpacity(0.3)
                       : Theme.of(context).colorScheme.primary,
                 )),
           ),

@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_w10_3th_d11_pomodoro/components/card.dart';
+import 'package:flutter_w10_3th_d11_pomodoro/components/fade_in_filter.dart';
+import 'package:flutter_w10_3th_d11_pomodoro/components/interactive_container.dart';
 
 class Pomodoro extends StatefulWidget {
   const Pomodoro({super.key});
@@ -11,11 +13,12 @@ class Pomodoro extends StatefulWidget {
 
 class _PomodoroState extends State<Pomodoro> {
   final _listOfTotalSeconds = [900, 1200, 1500, 1800, 2100];
-  final int _seletedIndex = 2;
-  late var _totalSeconds = _listOfTotalSeconds[_seletedIndex];
+  final _listOfSpeed = [1, 10, 100, 1000, 10000];
+  var _currentSpeed = 100;
+  late var _totalSeconds = 1500;
   final _restingSeconds = 300;
-  final _totalRounds = 2;
-  final _totalGoals = 2;
+  final _totalRounds = 4;
+  final _totalGoals = 12;
 
   late var _currentSeconds = _totalSeconds;
   var _currentRounds = 0;
@@ -28,6 +31,18 @@ class _PomodoroState extends State<Pomodoro> {
   void _setTotalSeconds(int seconds) {
     _totalSeconds = seconds;
     _onResetPressed();
+  }
+
+  void _onChangeSpeed() {
+    final index = _listOfSpeed.indexOf(_currentSpeed);
+    final nextIndex = (index + 1) % _listOfSpeed.length;
+    setState(() {
+      _currentSpeed = _listOfSpeed[nextIndex];
+    });
+    if (_isRunning) {
+      _onPausePressed();
+      _onStartPressed();
+    }
   }
 
   void _onTick(Timer timer) {
@@ -63,7 +78,7 @@ class _PomodoroState extends State<Pomodoro> {
 
   void _onStartPressed() {
     _timer = Timer.periodic(
-      const Duration(milliseconds: 5),
+      Duration(microseconds: 1000000 ~/ _currentSpeed),
       _onTick,
     );
     setState(() {
@@ -160,47 +175,51 @@ class _PomodoroState extends State<Pomodoro> {
                       child: Row(
                         children: [
                           ..._listOfTotalSeconds.map(
-                            (item) => GestureDetector(
-                              onTap: () => _setTotalSeconds(item),
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 5),
-                                child: Container(
-                                  width: 75,
-                                  height: 50,
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
+                            (item) => InteractiveContainer(
+                              bottomValue: 0.8,
+                              topValue: 1.0,
+                              child: GestureDetector(
+                                onTap: () => _setTotalSeconds(item),
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 5),
+                                  child: Container(
+                                    width: 75,
+                                    height: 50,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: item == _totalSeconds
+                                            ? Theme.of(context)
+                                                .colorScheme
+                                                .onPrimary
+                                            : Theme.of(context)
+                                                .colorScheme
+                                                .onPrimary
+                                                .withOpacity(0.5),
+                                        width: 2.5,
+                                      ),
                                       color: item == _totalSeconds
                                           ? Theme.of(context)
                                               .colorScheme
                                               .onPrimary
-                                          : Theme.of(context)
-                                              .colorScheme
-                                              .onPrimary
-                                              .withOpacity(0.5),
-                                      width: 2.5,
+                                          : null,
+                                      borderRadius: BorderRadius.circular(5),
                                     ),
-                                    color: item == _totalSeconds
-                                        ? Theme.of(context)
-                                            .colorScheme
-                                            .onPrimary
-                                        : null,
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                  child: Text(
-                                    "${item ~/ 60}",
-                                    style: TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                      color: item == _totalSeconds
-                                          ? Theme.of(context)
-                                              .colorScheme
-                                              .primary
-                                          : Theme.of(context)
-                                              .colorScheme
-                                              .onPrimary
-                                              .withOpacity(0.5),
+                                    child: Text(
+                                      "${item ~/ 60}",
+                                      style: TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
+                                        color: item == _totalSeconds
+                                            ? Theme.of(context)
+                                                .colorScheme
+                                                .primary
+                                            : Theme.of(context)
+                                                .colorScheme
+                                                .onPrimary
+                                                .withOpacity(0.5),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -210,21 +229,11 @@ class _PomodoroState extends State<Pomodoro> {
                         ],
                       ),
                     ),
-                    IgnorePointer(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Theme.of(context).primaryColor,
-                              Theme.of(context).primaryColor.withOpacity(0),
-                              Theme.of(context).primaryColor.withOpacity(0),
-                              Theme.of(context).primaryColor,
-                            ],
-                            stops: const [0.0, 0.3, 0.7, 1.0],
-                          ),
-                        ),
-                      ),
-                    ),
+                    FadeInFilter(
+                      sideColor: Theme.of(context).primaryColor,
+                      centerColor:
+                          Theme.of(context).primaryColor.withOpacity(0),
+                    )
                   ],
                 ),
               ),
@@ -232,49 +241,74 @@ class _PomodoroState extends State<Pomodoro> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    const SizedBox(
-                      width: 50,
-                    ),
-                    GestureDetector(
-                      onTap: _isRunning ? _onPausePressed : _onStartPressed,
-                      child: Container(
-                        width: 95,
-                        height: 95,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .secondary
-                              .withOpacity(0.2),
-                          // color: Colors.yellow,
+                    InteractiveContainer(
+                      child: GestureDetector(
+                        onTap: _onChangeSpeed,
+                        child: Container(
+                          width: 60,
+                          height: 60,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .secondary
+                                .withOpacity(0.2),
+                            // color: Colors.yellow,
+                          ),
+                          child: Text(
+                            "x$_currentSpeed",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
-                        child: _isRunning
-                            ? const Icon(
-                                Icons.pause,
-                                size: 50,
-                              )
-                            : const Icon(
-                                Icons.play_arrow,
-                                size: 50,
-                              ),
                       ),
                     ),
-                    GestureDetector(
-                      onTap: _onResetPressed,
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .secondary
-                              .withOpacity(0.2),
-                          // color: Colors.yellow,
+                    InteractiveContainer(
+                      child: GestureDetector(
+                        onTap: _isRunning ? _onPausePressed : _onStartPressed,
+                        child: Container(
+                          width: 95,
+                          height: 95,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .secondary
+                                .withOpacity(0.2),
+                            // color: Colors.yellow,
+                          ),
+                          child: _isRunning
+                              ? const Icon(
+                                  Icons.pause,
+                                  size: 50,
+                                )
+                              : const Icon(
+                                  Icons.play_arrow,
+                                  size: 50,
+                                ),
                         ),
-                        child: const Icon(
-                          Icons.settings_backup_restore_rounded,
-                          size: 35,
+                      ),
+                    ),
+                    InteractiveContainer(
+                      child: GestureDetector(
+                        onTap: _onResetPressed,
+                        child: Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .secondary
+                                .withOpacity(0.2),
+                            // color: Colors.yellow,
+                          ),
+                          child: const Icon(
+                            Icons.settings_backup_restore_rounded,
+                            size: 45,
+                          ),
                         ),
                       ),
                     ),
