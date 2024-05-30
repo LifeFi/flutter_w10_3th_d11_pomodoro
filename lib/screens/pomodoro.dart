@@ -14,13 +14,13 @@ class Pomodoro extends StatefulWidget {
 class _PomodoroState extends State<Pomodoro> {
   final _listOfTotalSeconds = [900, 1200, 1500, 1800, 2100];
   final _listOfSpeed = [1, 10, 100, 1000, 10000];
-  var _currentSpeed = 100;
-  late var _totalSeconds = 1500;
+  var _totalSeconds = 1500;
   final _restingSeconds = 300;
   final _totalRounds = 4;
   final _totalGoals = 12;
 
-  late var _currentSeconds = _totalSeconds;
+  var _currentSeconds = 1500;
+  var _currentSpeed = 100;
   var _currentRounds = 0;
   var _currentGoals = 0;
 
