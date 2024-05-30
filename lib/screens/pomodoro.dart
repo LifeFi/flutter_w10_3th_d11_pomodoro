@@ -23,7 +23,7 @@ class _PomodoroState extends State<Pomodoro> {
 
   bool _isRunning = false;
   bool _isResting = false;
-  late Timer _timer;
+  Timer? _timer;
 
   void _setTotalSeconds(int seconds) {
     _totalSeconds = seconds;
@@ -72,7 +72,7 @@ class _PomodoroState extends State<Pomodoro> {
   }
 
   void _onPausePressed() {
-    _timer.cancel();
+    _timer?.cancel();
     setState(() {
       _isRunning = false;
     });
@@ -152,53 +152,80 @@ class _PomodoroState extends State<Pomodoro> {
                 ),
               ),
               Expanded(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      ..._listOfTotalSeconds.map(
-                        (item) => GestureDetector(
-                          onTap: () => _setTotalSeconds(item),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 5),
-                            child: Container(
-                              width: 75,
-                              height: 50,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: item == _totalSeconds
-                                      ? Theme.of(context).colorScheme.onPrimary
-                                      : Theme.of(context)
-                                          .colorScheme
-                                          .onPrimary
-                                          .withOpacity(0.5),
-                                  width: 2.5,
-                                ),
-                                color: item == _totalSeconds
-                                    ? Theme.of(context).colorScheme.onPrimary
-                                    : null,
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: Text(
-                                "${item ~/ 60}",
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                  color: item == _totalSeconds
-                                      ? Theme.of(context).colorScheme.primary
-                                      : Theme.of(context)
-                                          .colorScheme
-                                          .onPrimary
-                                          .withOpacity(0.5),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          ..._listOfTotalSeconds.map(
+                            (item) => GestureDetector(
+                              onTap: () => _setTotalSeconds(item),
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 5),
+                                child: Container(
+                                  width: 75,
+                                  height: 50,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: item == _totalSeconds
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .onPrimary
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .onPrimary
+                                              .withOpacity(0.5),
+                                      width: 2.5,
+                                    ),
+                                    color: item == _totalSeconds
+                                        ? Theme.of(context)
+                                            .colorScheme
+                                            .onPrimary
+                                        : null,
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  child: Text(
+                                    "${item ~/ 60}",
+                                    style: TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      color: item == _totalSeconds
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .primary
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .onPrimary
+                                              .withOpacity(0.5),
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
                           ),
+                        ],
+                      ),
+                    ),
+                    IgnorePointer(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Theme.of(context).primaryColor,
+                              Theme.of(context).primaryColor.withOpacity(0),
+                              Theme.of(context).primaryColor.withOpacity(0),
+                              Theme.of(context).primaryColor,
+                            ],
+                            stops: const [0.0, 0.3, 0.7, 1.0],
+                          ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
               Expanded(
