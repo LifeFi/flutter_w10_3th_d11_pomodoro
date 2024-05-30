@@ -14,7 +14,7 @@ class _PomodoroState extends State<Pomodoro> {
   final int _seletedIndex = 2;
   late var _totalSeconds = _listOfTotalSeconds[_seletedIndex];
   final _restingSeconds = 300;
-  final _totalRounds = 4;
+  final _totalRounds = 2;
   final _totalGoals = 2;
 
   late var _currentSeconds = _totalSeconds;
@@ -63,7 +63,7 @@ class _PomodoroState extends State<Pomodoro> {
 
   void _onStartPressed() {
     _timer = Timer.periodic(
-      const Duration(milliseconds: 1),
+      const Duration(milliseconds: 5),
       _onTick,
     );
     setState(() {
