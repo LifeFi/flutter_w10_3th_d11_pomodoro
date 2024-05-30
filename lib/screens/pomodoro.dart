@@ -114,6 +114,12 @@ class _PomodoroState extends State<Pomodoro> {
   }
 
   @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final timerCardWidth = MediaQuery.of(context).size.width * 0.35;
     return Scaffold(
